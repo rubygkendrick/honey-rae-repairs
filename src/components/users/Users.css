@@ -11,3 +11,9 @@
     color: var(--info);
     font-family: "Roboto", sans-serif;
   }
+
+  .user:hover {
+    
+    transform: scale(1.1);
+
+  }
