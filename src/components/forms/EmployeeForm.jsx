@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react"
 import "./Form.css"
 import { getEmployeeByUserId, updateEmployee } from "../../services/employeeService"
-import {  useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-export const EmployeeForm = ({currentUser}) => {
+export const EmployeeForm = ({ currentUser }) => {
     const navigate = useNavigate()
-    const [employee , setEmployee] = useState({})
+    const [employee, setEmployee] = useState({})
 
-    useEffect(()=> {
+    useEffect(() => {
         getEmployeeByUserId(currentUser.id).then(data => {
             const employeeObject = data[0]
             setEmployee(employeeObject)
         })
-    },[currentUser])
+    }, [currentUser])
 
     const handleSave = (event) => {
         event.preventDefault()
@@ -22,40 +22,38 @@ export const EmployeeForm = ({currentUser}) => {
             rate: employee.rate,
             userId: employee.userId
         }
-        updateEmployee(editedEmployee).then(()=> {
+        updateEmployee(editedEmployee).then(() => {
             navigate(`/employees/${currentUser.id}`)
         })
-
+    }
+    const handleInputChange = (event) => {
+        const stateCopy = { ...employee }
+        stateCopy[event.target.name] = event.target.value
+        setEmployee(stateCopy)
     }
 
 
-    return(
+    return (
         <form className="profile">
             <h2>Update Profile</h2>
             <fieldset>
                 <div className="form-group">
                     <label>Specialty:</label>
                     <input type="text"
-                    value={employee.specialty}
-                    onChange={(event)=>{
-                        const copy = {...employee}
-                        copy.specialty = event.target.value
-                        setEmployee(copy)
-                    }}
-                    required className="form-control"/>
+                        name="specialty"
+                        value={employee.specialty ? employee.specialty : ''}
+                        onChange={handleInputChange}
+                        required className="form-control" />
                 </div>
             </fieldset>
             <fieldset>
                 <div className="form-group">
                     <label>Hourly Rate:</label>
-                    <input type="number" 
-                    value={employee.rate}
-                    onChange={(event)=>{
-                        const copy = {...employee}
-                        copy.rate = event.target.value
-                        setEmployee(copy)
-                    }}
-                    required className="form-control"/>
+                    <input type="number"
+                        name="rate"
+                        value={employee.rate ? employee.rate : 0}
+                        onChange={handleInputChange}
+                        required className="form-control" />
                 </div>
             </fieldset>
             <fieldset>
