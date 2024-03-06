@@ -8,6 +8,7 @@ import { TicketFilterBar } from "./TicketFilterBar"
 export const TicketList = ({ currentUser }) => {
     const [allTickets, setAllTickets] = useState([]) // [stateVariable, setterFunction]
     const [showEmergencyOnly, setShowEmergencyOnly] = useState(false)
+    const [showOpenOnly, setShowOpenOnly] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredTickets, setFilteredTickets] = useState([])
 
@@ -32,14 +33,29 @@ export const TicketList = ({ currentUser }) => {
 
     const getAndResetTickets = () => {
         getAllTickets().then(ticketsArray => {
-            setAllTickets(ticketsArray)
+            if (currentUser.isStaff) {
+                setAllTickets(ticketsArray)
+            } else {
+                const customerTickets = ticketsArray.filter(
+                    (ticket) => ticket.userId == currentUser.id
+                )
+                setAllTickets(customerTickets)
+            }
         })
     }
 
     useEffect(() => {
         getAndResetTickets()
-    }, [])
+    }, [currentUser])
 
+        useEffect(()=> {
+            if (showOpenOnly) {
+                const openTickets = allTickets.filter(ticket => ticket.dateCompleted === "")
+                setFilteredTickets(openTickets)
+            } else {
+                setFilteredTickets(allTickets)
+            }
+        }, [showOpenOnly , allTickets])
 
 
 
@@ -48,7 +64,9 @@ export const TicketList = ({ currentUser }) => {
             <h2>Tickets</h2>
             <TicketFilterBar
                 setShowEmergencyOnly={setShowEmergencyOnly}
-                setSearchTerm={setSearchTerm} />
+                setSearchTerm={setSearchTerm}
+                setShowOpenOnly={setShowOpenOnly}
+                currentUser={currentUser} />
             <article className="tickets">
                 {filteredTickets.map((ticketObject) => {
                     return (
