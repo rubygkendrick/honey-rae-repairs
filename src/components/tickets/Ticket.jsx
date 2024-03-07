@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { getAllEmployees } from "../../services/employeeService"
-import { assignTicket, updateTicket } from "../../services/ticketService"
+import { assignTicket, deleteTicket, updateTicket } from "../../services/ticketService"
 
 export const Ticket = ({ ticket, currentUser, getAndResetTickets }) => {
 
@@ -30,7 +30,7 @@ export const Ticket = ({ ticket, currentUser, getAndResetTickets }) => {
             employeeId: currentEmployee.id,
             serviceTicketId: ticket.id
         }
-        assignTicket(newEmployeeTicket).then(()=>{
+        assignTicket(newEmployeeTicket).then(() => {
             getAndResetTickets()
         })
     }
@@ -45,9 +45,16 @@ export const Ticket = ({ ticket, currentUser, getAndResetTickets }) => {
             dateCompleted: new Date(),
         }
 
-        updateTicket(closedTicket).then(()=>{
+        updateTicket(closedTicket).then(() => {
             getAndResetTickets()
         })
+    }
+
+    const handleDelete = () => {
+        deleteTicket(ticket.id).then(() => {
+            getAndResetTickets()
+        }
+        )
     }
 
     return (<section className="ticket" >
@@ -73,8 +80,11 @@ export const Ticket = ({ ticket, currentUser, getAndResetTickets }) => {
                 {/* if the logged in user is the assigned employee for the ticket and 
                 there is no date completed,
                 then a button to close the ticket should display*/}
-                { assignedEmployee?.userId === currentUser.id && !ticket.dateCompleted ? 
-                <button className="btn btn-warning" onClick={handleClose}>Close</button> : ""}
+                {assignedEmployee?.userId === currentUser.id && !ticket.dateCompleted ?
+                    <button className="btn btn-warning" onClick={handleClose}>Close</button> : ""}
+                {!currentUser.isStaff ? (
+                    <button className="btn btn-warning" onClick={handleDelete}>Delete</button>
+                ) : ""}
             </div>
         </footer>
     </section>)
